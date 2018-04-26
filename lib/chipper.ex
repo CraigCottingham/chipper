@@ -12,7 +12,7 @@ defmodule Chipper do
       :ok
 
   """
-  @spec main(list()) :: none()
+  @spec main([binary()]) :: :ok
   def main(args \\ []) do
     {_opts, _, _} = OptionParser.parse(
                       args,
