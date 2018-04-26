@@ -1,0 +1,55 @@
+# Ruby CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-elixir/ for more details
+#
+version: 2
+jobs:
+  build:
+    working_directory: ~/app
+
+    docker:
+      - image: circleci/elixir:1.6
+        environment:
+          MIX_ENV: test
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install hex and rebar
+          command: |
+            mix local.hex --force
+            mix local.rebar --force
+
+      - restore_cache:
+          keys:
+            - v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - v1-mix-cache-{{ .Branch }}
+            - v1-mix-cache
+      - restore_cache:
+          keys:
+            - v1-build-cache-{{ .Branch }}
+            - v1-build-cache
+
+      - run:
+          name: Install dependencies
+          command: |
+            mix deps.get
+
+      - save_cache:
+          key: v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+          paths: "deps"
+      - save_cache:
+          key: v1-build-cache-{{ .Branch }}
+          paths: "_build"
+
+      - run:
+          name: Compile
+          command: |
+            mix compile
+
+      - run:
+          name: Run tests
+          command: |
+            TEST_FILES="$(circleci tests glob "apps/**/test/*_test.exs" | circleci tests split --split-by=timings)"
+            mix test --no-color --trace $TEST_FILES
