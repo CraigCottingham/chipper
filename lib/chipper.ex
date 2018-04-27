@@ -14,7 +14,9 @@ defmodule Chipper do
       {:error, nil}
       iex> Chipper.main(["-?"])
       {:error, nil}
-      iex> Chipper.main(["foo"])
+      iex> Chipper.main(["test/hello.ex"])
+      {:error, :container_not_found}
+      iex> Chipper.main(["test/Elixir.Hello.beam"])
       {:ok, []}
       iex> Chipper.main(["-x"])
       {:error, :invalid_opts}
@@ -32,7 +34,7 @@ defmodule Chipper do
 
   @spec main([{atom(), any()}], [binary()], [{atom(), any()}]) :: atom()
   defp main(_opts, [filename | _remaining_args], []) do
-    File.stream!(filename, [:raw, :read_ahead, :binary], 4096)
+    File.stream!(filename, [:raw, :read_ahead, :binary], 1)
     |> Chipper.IFF.read
   end
   defp main(_opts, [], []), do: usage()
