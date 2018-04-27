@@ -9,15 +9,15 @@ defmodule Chipper do
   ## Examples
 
       iex> Chipper.main()
-      :ok
+      {:error, nil}
       iex> Chipper.main(["-h"])
-      :ok
+      {:error, nil}
       iex> Chipper.main(["-?"])
-      :ok
+      {:error, nil}
       iex> Chipper.main(["foo"])
-      :ok
+      {:ok, []}
       iex> Chipper.main(["-x"])
-      :error
+      {:error, :invalid_opts}
 
   """
   @spec main([binary()]) :: atom()
@@ -31,17 +31,24 @@ defmodule Chipper do
   end
 
   @spec main([{atom(), any()}], [binary()], [{atom(), any()}]) :: atom()
-  defp main(_opts, _args, []) do
-    :ok
+  defp main(_opts, [filename | _remaining_args], []) do
+    File.stream!(filename, [:raw, :read_ahead, :binary], 4096)
+    |> Chipper.IFF.read
   end
-  defp main(_, _, invalid_opts), do: usage(invalid_opts)
+  defp main(_opts, [], []), do: usage()
+  defp main(_, _, invalid_opts), do: print_invalid_opts(invalid_opts)
 
-  @spec usage([{atom(), any()}]) :: atom()
-  defp usage(invalid_opts) do
+  @spec print_invalid_opts([{atom(), any()}]) :: {atom(), any()}
+  defp print_invalid_opts(invalid_opts) do
     IO.puts :stderr, "invalid options: #{inspect invalid_opts}"
+    usage(:invalid_opts)
+  end
+
+  @spec usage(any()) :: {atom(), any()}
+  defp usage(reason \\ nil) do
     IO.puts :stderr, """
     Usage: chipper
     """
-    :error
+    {:error, reason}
   end
 end
