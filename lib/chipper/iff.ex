@@ -1,6 +1,49 @@
 defmodule Chipper.IFF do
   @moduledoc """
   Documentation for Chipper.IFF.
+
+  A BEAM file is formatted like this (using pseudo-`yecc`):
+
+Rootsymbol iff.
+
+iff -> containers.
+
+containers -> container.
+containers -> container containers.
+
+container -> container_signature container_size beam_signature sections.
+
+container_signature -> <<0x46, 0x4F, 0x52, 0x31>>.
+
+container_size -> u32_big.
+
+beam_signature -> <<0x42, 0x45, 0x41, 0x4D>>.
+
+sections -> section.
+sections -> section sections.
+
+section -> "Atom" chunk_size atom_count atoms chunk_padding.
+section -> "AtU8" chunk_size atom_count atoms chunk_padding.
+section -> "Code" chunk_size
+section -> "CatT" chunk_size
+section -> "FunT" chunk_size
+section -> "ExpT" chunk_size
+section -> "LitT" chunk_size
+section -> "ImpT" chunk_size
+section -> "LocT" chunk_size
+section -> "Line" chunk_size
+section -> "StrT" chunk_size
+section -> "Attr" chunk_size
+
+atom_count -> u32_big.
+
+atoms -> atom.
+atoms -> atom atoms.
+
+atom -> string_length string.
+
+string_length -> u8.
+
   """
 
   @doc """
