@@ -10,14 +10,19 @@ defmodule Chipper do
 
       iex> Chipper.main()
       {:error, nil}
+
       iex> Chipper.main(["-h"])
       {:error, nil}
+
       iex> Chipper.main(["-?"])
       {:error, nil}
+
       iex> Chipper.main(["test/hello.ex"])
       {:error, :container_not_found}
+
       iex> Chipper.main(["test/Elixir.Hello.beam"])
       {:ok, []}
+
       iex> Chipper.main(["-x"])
       {:error, :invalid_opts}
 
