@@ -12,29 +12,6 @@ defmodule Chipper.BEAM do
 
     sections -> section.
     sections -> section sections.
-
-    section -> "Atom" chunk_size atom_count atoms chunk_padding.
-    section -> "AtU8" chunk_size atom_count atoms chunk_padding.
-    section -> "Code" chunk_size
-    section -> "CatT" chunk_size
-    section -> "FunT" chunk_size
-    section -> "ExpT" chunk_size
-    section -> "LitT" chunk_size
-    section -> "ImpT" chunk_size
-    section -> "LocT" chunk_size
-    section -> "Line" chunk_size
-    section -> "StrT" chunk_size
-    section -> "Attr" chunk_size
-
-    atom_count -> u32_big.
-
-    atoms -> atom.
-    atoms -> atom atoms.
-
-    atom -> string_length string.
-
-    string_length -> u8.
-
   """
 
   require Logger
@@ -49,7 +26,7 @@ defmodule Chipper.BEAM do
     # Logger.debug(fn -> "#{inspect self()}: in Chipper.BEAM.read/1; stream = #{inspect stream}" end)
 
     case Chipper.BinaryUtils.read_4(stream) do
-      {:ok, <<0x42, 0x45, 0x41, 0x4D>>, stream} ->
+      {:ok, "BEAM", stream} ->
         # Logger.debug(fn -> "#{inspect self()}: found 'BEAM'" end)
 
         sections = Stream.resource(fn -> stream end,
@@ -62,7 +39,6 @@ defmodule Chipper.BEAM do
                                    fn _ -> nil end)
                    |> Enum.to_list
         {:ok, sections}
-        # {:ok, []}
 
       {:ok, _bin, _stream} ->
         # Logger.debug(fn -> "#{inspect self()}: found #{inspect (bin <> <<0>>)}" end)
