@@ -3,6 +3,8 @@ defmodule Chipper do
   Documentation for Chipper.
   """
 
+  require Logger
+
   @doc """
   Entry point for CLI tool.
 
@@ -20,8 +22,11 @@ defmodule Chipper do
       iex> Chipper.main(["test/hello.ex"])
       {:error, :container_not_found}
 
-      iex> Chipper.main(["test/Elixir.Hello.beam"])
-      {:ok, []}
+      iex> {:ok, length, sections} = Chipper.main(["test/Elixir.Hello.beam"])
+      iex> length
+      900
+      iex> Enum.count(sections)
+      12
 
       iex> Chipper.main(["-x"])
       {:error, :invalid_opts}
