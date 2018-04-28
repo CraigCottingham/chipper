@@ -24,6 +24,7 @@ defmodule Chipper.MixProject do
   defp deps do
     [
       {:dialyzex, "~> 1.1", only: :dev},
+      {:mix_test_watch, "~> 0.6.0", only: :dev},
     ]
   end
 end
