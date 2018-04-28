@@ -28,12 +28,15 @@ defmodule Chipper.IFF do
     # Logger.debug(fn -> "#{inspect self()}: in Chipper.IFF.read/1; stream = #{inspect stream}" end)
 
     case Chipper.BinaryUtils.read_8(stream) do
-      {:ok, <<0x46, 0x4F, 0x52, 0x31, _::big-unsigned-integer-size(32)>>, stream} ->
+      {:ok, <<0x46, 0x4F, 0x52, 0x31, container_length::big-unsigned-integer-size(32)>>, stream} ->
         # Logger.debug(fn -> "#{inspect self()}: found 'FOR1'" end)
-        Chipper.BEAM.read(stream)
+        case Chipper.BEAM.read(stream) do
+          {:ok, sections} -> {:ok, (container_length + 8), sections}
+          _ -> {:error, :invalid_container}
+        end
 
       {:ok, <<_::big-unsigned-integer-size(32), bytes_to_skip::big-unsigned-integer-size(32)>>, stream} ->
-        # Logger.debug(fn -> "#{inspect self()}: found something else" end)
+        # Logger.debug(fn -> "#{inspect self()}: found something else, skipping #{bytes_to_skip} bytes" end)
         read(Stream.drop(stream, bytes_to_skip))
 
       _ ->
