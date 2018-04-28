@@ -49,10 +49,20 @@ defmodule Chipper.BEAM do
     # Logger.debug(fn -> "#{inspect self()}: in Chipper.BEAM.read/1; stream = #{inspect stream}" end)
 
     case Chipper.BinaryUtils.read_4(stream) do
-      {:ok, <<0x42, 0x45, 0x41, 0x4D>>, _stream} ->
+      {:ok, <<0x42, 0x45, 0x41, 0x4D>>, stream} ->
         # Logger.debug(fn -> "#{inspect self()}: found 'BEAM'" end)
-        # read sections
-        {:ok, []}
+
+        sections = Stream.resource(fn -> stream end,
+                                   fn stream ->
+                                     case Chipper.Section.read(stream) do
+                                       {:ok, section, stream} -> {[section], stream}
+                                       _ -> {:halt, stream}
+                                     end
+                                   end,
+                                   fn _ -> nil end)
+                   |> Enum.to_list
+        {:ok, sections}
+        # {:ok, []}
 
       {:ok, _bin, _stream} ->
         # Logger.debug(fn -> "#{inspect self()}: found #{inspect (bin <> <<0>>)}" end)
