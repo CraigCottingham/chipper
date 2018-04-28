@@ -21,8 +21,9 @@ defmodule Chipper.Section.CatT do
   def read(stream) do
     {:ok, <<chunk_length::big-unsigned-integer-size(32)>>, stream} = Chipper.BinaryUtils.read_4(stream)
 
-    stream = Stream.drop(stream, Chipper.BinaryUtils.pad_to_multiple(chunk_length, 4))
+    {:ok, chunk_data, stream} = Chipper.BinaryUtils.read_n(stream, chunk_length)
+    stream = Stream.drop(stream, (Chipper.BinaryUtils.pad_to_multiple(chunk_length, 4) - chunk_length))
 
-    {:ok, {"CatT", chunk_length}, stream}
+    {:ok, {"CatT", chunk_length, chunk_data}, stream}
   end
 end
