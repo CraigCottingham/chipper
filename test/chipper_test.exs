@@ -34,29 +34,30 @@ defmodule ChipperTest do
 
     for section <- sections do
       case section do
-        {"AtU8", 119} ->
+        {"AtU8", 119, data} ->
+          Logger.debug(fn -> inspect data end)
           assert true
-        {"Code", 143} ->
+        {"Code", 143, _} ->
           assert true
-        {"StrT", 0} ->
+        {"StrT", 0, _} ->
           assert true
-        {"ImpT", 28} ->
+        {"ImpT", 28, _} ->
           assert true
-        {"ExpT", 40} ->
+        {"ExpT", 40, _} ->
           assert true
-        {"LocT", 4} ->
+        {"LocT", 4, _} ->
           assert true
-        {"Attr", 40} ->
+        {"Attr", 40, _} ->
           assert true
-        {"CInf", 105} ->
+        {"CInf", 105, _} ->
           assert true
-        {"Dbgi", 169} ->
+        {"Dbgi", 169, _} ->
           assert true
-        {"ExDc", 86} ->
+        {"ExDc", 86, _} ->
           assert true
-        {"ExDp", 27} ->
+        {"ExDp", 27, _} ->
           assert true
-        {"Line", 20} ->
+        {"Line", 20, _} ->
           assert true
         {chunk_name, chunk_length} ->
           Logger.error(fn -> "unknown chunk name #{inspect chunk_name} with length #{chunk_length}" end)
