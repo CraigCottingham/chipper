@@ -64,4 +64,29 @@ defmodule Chipper.BinaryUtils do
       {:error, :insufficient_data, stream}
     end
   end
+
+  @doc """
+  Pad a value to an alignment multiple.
+
+  aligned_value = multiple * ((unaligned_value + multiple - 1) / multiple)
+
+  See http://beam-wisdoms.clau.se/en/latest/indepth-beam-file.html
+
+  ## Examples
+
+      iex> Chipper.BinaryUtils.pad_to_multiple(119, 4)
+      120
+
+      iex> Chipper.BinaryUtils.pad_to_multiple(120, 4)
+      120
+
+      iex> Chipper.BinaryUtils.pad_to_multiple(121, 4)
+      124
+
+      iex> Chipper.BinaryUtils.pad_to_multiple(0, 4)
+      0
+
+  """
+  @spec pad_to_multiple(non_neg_integer(), non_neg_integer()) :: non_neg_integer()
+  def pad_to_multiple(unaligned_value, multiple), do: multiple * div((unaligned_value + multiple - 1), multiple)
 end
