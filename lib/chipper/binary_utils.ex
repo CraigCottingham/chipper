@@ -52,7 +52,8 @@ defmodule Chipper.BinaryUtils do
   @spec read_8(any()) :: {:ok, binary(), any()} | {:error, atom(), any()}
   def read_8(stream), do: read_n(stream, 8)
 
-  defp read_n(stream, n) do
+  @spec read_n(any(), non_neg_integer()) :: {:ok, binary(), any()} | {:error, atom(), any()}
+  def read_n(stream, n) do
     bin = stream
           |> Stream.take(n)
           |> Enum.to_list
