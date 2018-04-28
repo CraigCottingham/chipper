@@ -2,49 +2,21 @@ defmodule Chipper.IFF do
   @moduledoc """
   Documentation for Chipper.IFF.
 
-  A BEAM file is formatted like this (using pseudo-`yecc`):
+  An IFF file is formatted like this (using pseudo-`yecc`):
 
-Rootsymbol iff.
+    Rootsymbol iff.
 
-iff -> containers.
+    iff -> containers.
 
-containers -> container.
-containers -> container containers.
+    containers -> container.
+    containers -> container containers.
 
-container -> container_signature container_size beam_signature sections.
+    container -> container_signature container_size container_contents.
 
-container_signature -> <<0x46, 0x4F, 0x52, 0x31>>.
-
-container_size -> u32_big.
-
-beam_signature -> <<0x42, 0x45, 0x41, 0x4D>>.
-
-sections -> section.
-sections -> section sections.
-
-section -> "Atom" chunk_size atom_count atoms chunk_padding.
-section -> "AtU8" chunk_size atom_count atoms chunk_padding.
-section -> "Code" chunk_size
-section -> "CatT" chunk_size
-section -> "FunT" chunk_size
-section -> "ExpT" chunk_size
-section -> "LitT" chunk_size
-section -> "ImpT" chunk_size
-section -> "LocT" chunk_size
-section -> "Line" chunk_size
-section -> "StrT" chunk_size
-section -> "Attr" chunk_size
-
-atom_count -> u32_big.
-
-atoms -> atom.
-atoms -> atom atoms.
-
-atom -> string_length string.
-
-string_length -> u8.
-
+  See Chipper.BEAM for the container contents.
   """
+
+  require Logger
 
   @doc """
   Read an IFF container.
@@ -53,36 +25,19 @@ string_length -> u8.
   """
   @spec read(any()) :: any()
   def read(stream) do
-    stream
-    |> Stream.take(4)
-    |> Enum.to_list
-    |> :erlang.list_to_binary
-    |> read_container(Stream.drop(stream, 4))
-  end
+    # Logger.debug(fn -> "#{inspect self()}: in Chipper.IFF.read/1; stream = #{inspect stream}" end)
 
-  defp read_container(<<0x46, 0x4F, 0x52, 0x31>>, stream) do
-    container_size = stream
-                     |> Stream.take(4)
-                     |> Enum.to_list
-                     |> :erlang.list_to_binary
-                     |> get_uint32
-    {:ok, []}
-  end
+    case Chipper.BinaryUtils.read_8(stream) do
+      {:ok, <<0x46, 0x4F, 0x52, 0x31, _::big-unsigned-integer-size(32)>>, stream} ->
+        # Logger.debug(fn -> "#{inspect self()}: found 'FOR1'" end)
+        Chipper.BEAM.read(stream)
 
-  defp read_container(_, stream) do
-    container_size = stream
-                     |> Stream.take(4)
-                     |> Enum.to_list
-                     |> :erlang.list_to_binary
-                     |> get_uint32
-    if is_nil(container_size) do
-      {:error, :container_not_found}
-    else
-      Stream.drop(stream, container_size)
-      |> read
+      {:ok, <<_::big-unsigned-integer-size(32), bytes_to_skip::big-unsigned-integer-size(32)>>, stream} ->
+        # Logger.debug(fn -> "#{inspect self()}: found something else" end)
+        read(Stream.drop(stream, bytes_to_skip))
+
+      _ ->
+        {:error, :container_not_found}
     end
   end
-
-  defp get_uint32(<<num::big-unsigned-integer-size(32)>>), do: num
-  defp get_uint32(_), do: nil
 end
