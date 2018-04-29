@@ -66,6 +66,12 @@ defmodule Chipper.BinaryUtils do
     end
   end
 
+  @spec read_u32_big(any()) :: {:ok, non_neg_integer(), any()} | {:error, atom(), any()}
+  def read_u32_big(stream) do
+    {:ok, <<num::big-unsigned-integer-size(32)>>, stream} = read_4(stream)
+    {:ok, num, stream}
+  end
+
   @doc """
   Pad a value to an alignment multiple.
 
