@@ -22,8 +22,21 @@ defmodule Chipper.Section.Attr do
     {:ok, <<chunk_length::big-unsigned-integer-size(32)>>, stream} = Chipper.BinaryUtils.read_4(stream)
 
     {:ok, chunk_data, stream} = Chipper.BinaryUtils.read_n(stream, chunk_length)
+    term = :erlang.binary_to_term(chunk_data)
+
     stream = Stream.drop(stream, (Chipper.BinaryUtils.pad_to_multiple(chunk_length, 4) - chunk_length))
 
-    {:ok, {"Attr", chunk_length, chunk_data}, stream}
+    {
+      :ok,
+      {
+        "Attr",
+        chunk_length,
+        %{
+          term: term,
+        }
+      },
+      stream
+    }
+
   end
 end
