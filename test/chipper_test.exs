@@ -40,10 +40,12 @@ defmodule ChipperTest do
           assert (data.term |> List.first |> elem(0)) == :vsn
 
         {"AtU8", 119, data} ->
-          Logger.debug(fn -> "AtU8: #{inspect data}" end)
-          assert true
+          # Logger.debug(fn -> "AtU8: #{inspect data}" end)
+          assert is_map(data)
+          assert is_list(data.atoms)
+          assert Enum.count(data.atoms) == 12
 
-        {"CInf", 105, data} ->
+        {"CInf", 105, _data} ->
           # Logger.debug(fn -> "CInf: #{inspect data}" end)
           assert true
 
@@ -51,15 +53,15 @@ defmodule ChipperTest do
           Logger.debug(fn -> "Code: #{inspect data}" end)
           assert true
 
-        {"Dbgi", 169, data} ->
+        {"Dbgi", 169, _data} ->
           # Logger.debug(fn -> "Dbgi: #{inspect data}" end)
           assert true
 
-        {"ExDc", 86, data} ->
+        {"ExDc", 86, _data} ->
           # Logger.debug(fn -> "ExDc: #{inspect data}" end)
           assert true
 
-        {"ExDp", 27, data} ->
+        {"ExDp", 27, _data} ->
           # Logger.debug(fn -> "ExDp: #{inspect data}" end)
           assert true
 
