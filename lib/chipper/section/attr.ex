@@ -19,7 +19,7 @@ defmodule Chipper.Section.Attr do
   """
   @spec read(any()) :: any()
   def read(stream) do
-    {:ok, <<chunk_length::big-unsigned-integer-size(32)>>, stream} = Chipper.BinaryUtils.read_4(stream)
+    {:ok, chunk_length, stream} = Chipper.BinaryUtils.read_u32_big(stream)
 
     {:ok, chunk_data, stream} = Chipper.BinaryUtils.read_n(stream, chunk_length)
     term = :erlang.binary_to_term(chunk_data)
@@ -37,6 +37,5 @@ defmodule Chipper.Section.Attr do
       },
       stream
     }
-
   end
 end
