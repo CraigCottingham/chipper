@@ -5,6 +5,20 @@ defmodule Chipper.BinaryUtils do
   """
 
   @doc """
+  Read a 1-byte binary.
+
+  ## Examples
+
+      iex> {:ok, stream} = StringIO.open(<<0x01, 0x02, 0x03, 0x04>>)
+      iex> {:ok, bin, _} = Chipper.BinaryUtils.read_1(IO.binstream(stream, 1))
+      iex> bin
+      <<0x01>>
+
+  """
+  @spec read_1(any()) :: {:ok, binary(), any()} | {:error, atom(), any()}
+  def read_1(stream), do: read_n(stream, 1)
+
+  @doc """
   Read a 4-byte binary.
 
   ## Examples
@@ -52,6 +66,10 @@ defmodule Chipper.BinaryUtils do
   @spec read_8(any()) :: {:ok, binary(), any()} | {:error, atom(), any()}
   def read_8(stream), do: read_n(stream, 8)
 
+  @doc """
+  Read an n-byte binary.
+
+  """
   @spec read_n(any(), non_neg_integer()) :: {:ok, binary(), any()} | {:error, atom(), any()}
   def read_n(stream, n) do
     bin = stream
@@ -66,6 +84,20 @@ defmodule Chipper.BinaryUtils do
     end
   end
 
+  @doc """
+  Read an unsigned 8-bit integer.
+
+  """
+  @spec read_u8(any()) :: {:ok, non_neg_integer(), any()} | {:error, atom(), any()}
+  def read_u8(stream) do
+    {:ok, <<num::unsigned-integer-size(8)>>, stream} = read_1(stream)
+    {:ok, num, stream}
+  end
+
+  @doc """
+  Read an unsigned 32-bit integer.
+
+  """
   @spec read_u32_big(any()) :: {:ok, non_neg_integer(), any()} | {:error, atom(), any()}
   def read_u32_big(stream) do
     {:ok, <<num::big-unsigned-integer-size(32)>>, stream} = read_4(stream)
